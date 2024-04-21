@@ -1,24 +1,49 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import ForgetPass from "./components/ForgetPass";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Login from "./components/login";
+import Dashboard from "./components/Sidebar";
+import Employee from "./components/Employee";
+import Layout from "./components/Layout";
+import Device from "./components/Device";
+import Main from "./components/Main";
+
+import Common from "./components/Common";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />}></Route>
+        <Route path="/test" element={<Common />}></Route>
+        <Route path="/forgetpass" element={<ForgetPass />}></Route>
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
+              <Main />
+            </Layout>
+          }
+        ></Route>
+        <Route
+          path="/employee"
+          element={
+            <Layout>
+              <Employee />
+            </Layout>
+          }
+        ></Route>
+        <Route
+          path="/device"
+          element={
+            <Layout>
+              <Device />
+            </Layout>
+          }
+        ></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
