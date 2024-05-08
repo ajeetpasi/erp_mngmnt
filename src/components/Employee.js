@@ -2,36 +2,51 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineFileAdd } from "react-icons/ai";
 import { CiSearch } from "react-icons/ci";
 import AddEmployee from "./AddEmployee";
-import { FaRegEdit } from "react-icons/fa";
 import Box from "@mui/material/Box";
-
 import Button from "@mui/material/Button";
-
 import DeleteEmp from "./DeleteEmp";
 import EditEmployee from "./EditEmployee";
 import Modal from "@mui/material/Modal";
-
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
 
 const Employee = () => {
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [selectedEmp, setSelectedEmployee] = useState(null);
   const [employeeData, setEmployeeData] = useState([]);
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:5000/api/employee")
+  //     .then((response) => {
+  //       setEmployeeData(response.data);
+  //       console.log(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, []);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/employee")
+      .get("http://localhost:3000/empData")
       .then((response) => {
         setEmployeeData(response.data);
+        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
       });
-  });
-  const [openModal, setOpenModal] = React.useState(false);
-  const handleOpen = () => setOpenModal(true);
-  const handleEditClose = () => setOpenModal(false);
+  }, []);
 
+  const [openEditModal, setOpenEditModal] = React.useState(false);
+  const handleOpen = () => {
+    setOpenEditModal(true);
+  };
+  const handleEditClose = () => setOpenEditModal(false);
+
+  //--------------open delete modal--------------
   const [showModal1, setShowModal1] = useState(false);
   const handleOpenModal1 = () => {
     setShowModal1(true);
@@ -39,29 +54,20 @@ const Employee = () => {
   const handleCloseModal1 = () => {
     setShowModal1(false);
   };
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "auto",
-    bgcolor: "background.paper",
-    // border: "2px solid #000",
-    boxShadow: 24,
-    p: 0,
-  };
 
+  //------open three dot menu -----------------
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => {
+  const handleClick = (event, id, empname) => {
     setAnchorEl(event.currentTarget);
+    setSelectedEmployeeId(id);
+    setSelectedEmployee(empname);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const [showEditEmp, setShowEditEmp] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 5;
   const lastIndex = currentPage * recordsPerPage;
@@ -88,7 +94,7 @@ const Employee = () => {
 
   const [showAddEmp, setShowEmp] = useState(false);
 
-  const hanldeClick = () => {
+  const hanldeOpenEmp = () => {
     setShowEmp(true);
   };
 
@@ -123,7 +129,7 @@ const Employee = () => {
               <div>
                 <button
                   className="sm:px-4 flex items-center bg-red-600 sm:py-2 rounded-lg text-white sm:gap-2 text-xs sm:text-base h-6 sm:h-auto gap-1 p-2 sm:p-0"
-                  onClick={hanldeClick}
+                  onClick={hanldeOpenEmp}
                 >
                   <AiOutlineFileAdd /> Add Employee
                 </button>
@@ -172,7 +178,10 @@ const Employee = () => {
                             aria-controls={open ? "basic-menu" : undefined}
                             aria-haspopup="true"
                             aria-expanded={open ? "true" : undefined}
-                            onClick={handleClick}
+                            onClick={(event) =>
+                              handleClick(event, item.id, item.empName)
+                            }
+                            // onClick={handleClick}
                             className=""
                           >
                             <h1 className="text-black text-xl font-bold">
@@ -188,7 +197,11 @@ const Employee = () => {
                               "aria-labelledby": "basic-button",
                             }}
                           >
-                            <MenuItem onClick={handleOpen}>Edit</MenuItem>
+                            <MenuItem
+                              onClick={() => handleOpen(item.id, item.empName)}
+                            >
+                              Edit
+                            </MenuItem>
                             <MenuItem onClick={handleOpenModal1}>
                               Delete
                             </MenuItem>
@@ -246,14 +259,19 @@ const Employee = () => {
       {/* Edit Employee sectoin */}
 
       <Modal
-        open={openModal}
+        open={openEditModal}
         onClose={handleEditClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <Box sx={style}>
-          <EditEmployee onClick={handleEditClose} />
-        </Box>
+        <EditEmployee
+          onClick={handleEditClose}
+          id={selectedEmployeeId}
+          name={selectedEmp}
+        />
       </Modal>
 
       {/* Delete Employee section */}
@@ -267,7 +285,7 @@ const Employee = () => {
           justifyContent: "center",
         }}
       >
-        <DeleteEmp notShow={handleCloseModal1} />
+        <DeleteEmp notShow={handleCloseModal1} id={selectedEmployeeId} />
       </Modal>
       {/* <div>
         {showDeleteEmp && (
@@ -277,13 +295,13 @@ const Employee = () => {
         )}
       </div> */}
 
-      <div>
+      {/* <div>
         {showEditEmp && (
           <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
             <EditEmployee onClose={() => setShowEditEmp(false)} />
           </div>
         )}
-      </div>
+      </div> */}
     </>
   );
 };
